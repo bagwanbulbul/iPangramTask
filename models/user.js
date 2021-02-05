@@ -8,11 +8,10 @@ const user_login_schema = new schema({
     name: {
         type: String,
     },
-    // role: {
-    //     type: String,
-    //     default: 'user',
-    //     enum: ["admin"]
-    // },
+    cart_products: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'userCart'
+    }],
     email: {
         type: String,
         trim: true,

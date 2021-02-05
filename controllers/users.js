@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const AddCart = require('../models/addCart');
 const Product = require("../models/product")
+const Order = require("../models/order")
 var bcrypt = require('bcryptjs');
 
 const jwt = require('jsonwebtoken')
@@ -91,7 +92,7 @@ exports.edit_profile =(req,res)=>{
 exports.filterSearch = (req,res)=>{
     try{
         const product = req.body.product;
-        Product.find({product: product})
+        Product.find({product: {$regex:product, $options:'i'}})
         .then(result =>{
             console.log(result)
             res.send(result)
@@ -106,24 +107,40 @@ exports.filterSearch = (req,res)=>{
 }
 
 exports.addCart = async(req,res)=>{
+    const {product,userEmail} = req.body
     let cartDetails = {
-        product: req.body.product,
-        userEmail: req.body.userEmail
+        product: product,
+        userEmail: userEmail
     }
-    let response =new AddCart(cartDetails)
+    let response = new AddCart(cartDetails)
     response.save()
     .then((result)=>{
-        res.send("cart successfuly added")
+        User.updateOne({email:userEmail},{$push:{cart_products:result._id}})
+        .then((cart_resp)=>{
+            res.send("cart successfuly added")
+        })
     })
     .catch((err)=>{
         console.log(err)
         res.json({statusCode:"0",statusMsj:"Please try again"})
     })
 }
+
+exports.get_user_carts = (req,res)=>{
+    const {email}=req.body
+    User.findOne({email:email},{cart_products:1,email:1}).populate("cart_products")
+    .then((resp)=>{
+        res.send(resp);
+    })
+}
+
 exports.addProduct = async(req,res)=>{
     let productDetails = {
+        email:req.body.email,
         product: req.body.product,
-        productCategory: req.body.productCategory
+        productCategory: req.body.productCategory,
+        price: req.body.price,
+        quantity: req.body.quantity
     }
     let response =new Product(productDetails)
     response.save()
@@ -148,4 +165,41 @@ exports.viewProductDetails = (req,res)=>{
         console.log(err)
          res.send("there is error")
     }
+}
+exports.orderProduct = (req, res)=>{
+    try{
+        let orderDetails = {
+            email:req.body.email,
+            product: req.body.product,
+            productCategory: req.body.productCategory,
+            price: req.body.price,
+            quantity: req.body.quantity
+        }
+        let response =new Order(orderDetails)
+        response.save()
+        .then((result)=>{
+            res.send("oreder successful")
+        }).catch((err)=>{
+            console.log(err);
+            res.json({statusCode:"0",statusMsj:"oops! something went wrong"})
+        })
+    }catch(err){
+        console.log(err)
+    }
+}
+exports.disPlayOder = (req,res)=>{
+    try{
+        let email = req.body.email;
+        Order.findOne({email:email})
+        .then(result =>{
+            res.send(result)
+        }).catch((err)=>{
+            console.log(err)
+            res.send(err)
+        })
+    }catch(err){
+        console.log(err)
+         res.send("there is error")
+    }
+
 }

@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 const schema = mongoose.Schema
 // var Float = require('mongoose-float').loadType(mongoose);
 
-var products = new schema({
+var order = new schema({
     email:{
         type:String
     },
@@ -19,5 +19,5 @@ var products = new schema({
         type:String
     }
 });
-var allProduct = mongoose.model("products", products)
-module.exports = allProduct
+var allOrder = mongoose.model("order", order)
+module.exports = allOrder
