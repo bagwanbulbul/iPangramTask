@@ -7,7 +7,9 @@ const router = express.Router();
 router.use(bodyParser.urlencoded({ extended: false }))
 router.use(bodyParser.json())
 
-const {addProduct,filterSearch,orderFilter} = require('../controllers/admin')
+const {signup,addProduct,login,filterSearch,orderFilter} = require('../controllers/admin');
+router.post("/admin_signup",signup)
+router.post('/admin_login',login)
 router.post("/AddProduct",addProduct)
 router.post("/search",filterSearch)
 router.post("/OrderFilter",orderFilter)

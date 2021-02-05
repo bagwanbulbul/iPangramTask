@@ -19,12 +19,12 @@ exports.signup = async (req, res) => {
         const {
             name,
             email,
-            password,
+            password
         } = req.body
         // let user_roles = 0;
-        // if (req.body.role === "admin") {
+        // if (req.body.role == "admin") {
         //     user_roles = 1
-        // } 
+        // }
         const hashedPassword = await hashPassword(password);
         console.log(password)
         const newUser = new User({
